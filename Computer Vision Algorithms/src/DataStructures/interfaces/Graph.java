@@ -1,6 +1,7 @@
 package DataStructures.interfaces;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This interface defines a graph data structure
@@ -89,5 +90,12 @@ public interface Graph<V, E> {
      * @return returns the previous weight
      */
     E replaceEdge(Edge<V, E> edge, E newWeight) throws Exception;
+
+    /**
+     * This method checks if the given vertex belong to the graph, is so return a list of all edges that are associated with the vertex
+     * @param vertex vertex at hand
+     * @return returns a list of all edges linked to this vertex
+     */
+    List<Edge<V, E>> getEdgesAssociatedWithVertex(Vertex<V, E> vertex) throws Exception;
 
 }

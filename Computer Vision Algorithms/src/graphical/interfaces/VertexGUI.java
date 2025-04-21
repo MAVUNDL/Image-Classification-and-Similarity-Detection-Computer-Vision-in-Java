@@ -1,13 +1,18 @@
 package graphical.interfaces;
 
 import DataStructures.interfaces.Vertex;
+import graphical.styling.StyledNode;
 import graphical.styling.Styler;
 import javafx.beans.property.DoubleProperty;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * This interface represents a vertex in the GUI
  */
-public interface VertexGUI<V, E>  extends Styler {
+public interface VertexGUI<V, E>  extends Styler , StyledNode {
     /**
      * This method sets the position of the vertex using the x,y coordinates
      * @param x x-coordinate
@@ -73,6 +78,36 @@ public interface VertexGUI<V, E>  extends Styler {
      */
     DoubleProperty getShapeRadiusProperty();
 
+    /**
+     * THis method adds an adjacent vertex to the list
+     * @param vertexNode the adjacent vertex
+     */
+    void addAdjacentVertex(VertexGUI<V, E> vertexNode);
+    /**
+     * THis method removes the vertex adjacent to the current vertex
+     * @param vertexNode the vertex to be removed
+     * @return returns the removed vertex
+     */
+    VertexGUI<V, E> removeAdjacentVertex(VertexGUI<V, E> vertexNode);
+
+    /**
+     * This method returns a collection of adjacent vertexes from the current list
+     * @param vertexes the collection of vertexes
+     * @return returns the removed collection
+     */
+     List<VertexGUI<V,E>> removeAdjacentVertexes(Collection<VertexGUI<V, E>> vertexes);
+
+    /**
+     * This method checks if the given vertex is adjacent to the current one
+     * @param vertexGUI the vertex to be validated
+     * @return returns true if it is adjacent else false
+     */
+    boolean isAdjacent(VertexGUI<V, E> vertexGUI);
+
+    /**
+     * @return returns the number of adjacent vertexes to this one
+     */
+    int adjacentVertexes();
 
 
 }

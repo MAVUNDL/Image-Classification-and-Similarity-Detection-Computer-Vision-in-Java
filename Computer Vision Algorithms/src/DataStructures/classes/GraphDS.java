@@ -5,7 +5,9 @@ import DataStructures.interfaces.Graph;
 import DataStructures.interfaces.Vertex;
 import javafx.scene.image.Image;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class GraphDS<V, E> implements Graph<V, E> {
@@ -234,6 +236,25 @@ public class GraphDS<V, E> implements Graph<V, E> {
     }
 
     /**
+     * This method checks if the given vertex belong to the graph, is so return a list of all edges that are associated with the vertex
+     *
+     * @param vertex vertex at hand
+     * @return returns a list of all edges linked to this vertex
+     */
+    @Override
+    public List<Edge<V, E>> getEdgesAssociatedWithVertex(Vertex<V, E> vertex) throws Exception {
+        List<Edge<V, E>> associatedEdges = new ArrayList<>();
+        if(validateVertex(vertex)){
+            for(Edge<V,E> edge: this.graphEdges.values()){
+                if(edge.contains(vertex)){
+                    associatedEdges.add(edge);
+                }
+            }
+        }
+        return associatedEdges;
+    }
+
+    /**
      * This method validates if the vertex exits on the graph using its key
      * @param key the key for the vertex
      * @return returns true if the vertex exist on the graph else false
@@ -258,8 +279,7 @@ public class GraphDS<V, E> implements Graph<V, E> {
      */
     private String getVertexKey(V element){
         Image ImageNode = (Image) element; // cast to Image object to use image class properties
-        String imagePath = ImageNode.getUrl(); // get image path
-        return imagePath.substring(imagePath.lastIndexOf('/')); // get the name of the image and return it as a key
+        return Paths.get(ImageNode.getUrl()).getFileName().toString(); // get the name of the image and return it as a key
     }
 
     /**
@@ -272,11 +292,8 @@ public class GraphDS<V, E> implements Graph<V, E> {
         // cast to image object to use image class properties
         Image startImageNode = (Image) startElement;
         Image endImageNode = (Image) endElement;
-        // get image paths
-        String startImagePath = startImageNode.getUrl();
-        String endImagePath = endImageNode.getUrl();
         // get the name of images and create a key
-        return startImagePath.substring(startImagePath.lastIndexOf('/')) + " | " + endImagePath.substring(endImagePath.lastIndexOf('/'));
+        return Paths.get(startImageNode.getUrl()).getFileName().toString() + " | " +  Paths.get(endImageNode.getUrl()).getFileName().toString();
     }
 
     /**

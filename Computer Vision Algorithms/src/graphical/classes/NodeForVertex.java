@@ -11,10 +11,9 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Group;
 import javafx.scene.shape.Circle;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
-public class NodeForVertex<V, E> extends Group implements VertexGUI<V, E>, StyledNode {
+public class NodeForVertex<V, E> extends Group implements VertexGUI<V, E>{
     /*
         class variables
      */
@@ -25,16 +24,20 @@ public class NodeForVertex<V, E> extends Group implements VertexGUI<V, E>, Style
     private final NodeCircle vertexShape;
     private final NodeShape styledShape;
     private NodeLabel vertexLabel;
+    private final List<VertexGUI<V, E>> adjacentVertexes;
+
 
     public NodeForVertex(Vertex<V, E> underlyingVertex, double x, double y, double radius){
-        this.theUnderlyingVertexObject = underlyingVertex;
-        this.vertexLabel = null;
-        this.xCenterPosition = new SimpleDoubleProperty();
-        this.yCenterPosition = new SimpleDoubleProperty();
-        this.circleRadius =  new SimpleDoubleProperty();
+        this.theUnderlyingVertexObject = underlyingVertex; // setting underlying vertex
+        this.vertexLabel = null; // will update this in later stage
+        this.xCenterPosition = new SimpleDoubleProperty(); // initializing dynamic property  for the x-position of the center of the node
+        this.yCenterPosition = new SimpleDoubleProperty(); // initializing dynamic property  for the y-position of the center of the node
+        this.circleRadius =  new SimpleDoubleProperty(); // initializing dynamic property  for the radius of the node
+        this.adjacentVertexes = new ArrayList<>(); // crating list of the adjacent vertexes
         vertexShape =  new NodeCircle(x, y, radius); // create the circle for the vertex
-        this.styledShape = new NodeShape(this.vertexShape.getShape()); // get the vertex shape to style it
-        this.getChildren().add(this.vertexShape.getShape()); // add shape to group
+        ShapePropertiesBinder(vertexShape); // now since I have created a circle shape for the vertex, now I am binding the properties of the circle with vertex node
+        this.styledShape = new NodeShape(this.vertexShape.getShape()); // get the shape for the vertex to style it
+        this.getChildren().add(this.vertexShape.getShape()); // add shape to group node
     }
 
     /**
@@ -191,5 +194,84 @@ public class NodeForVertex<V, E> extends Group implements VertexGUI<V, E>, Style
     @Override
     public void addStyleClass(String css_class) {
         this.styledShape.addStyleClass(css_class);
+    }
+
+    /**
+     * THis method adds an adjacent vertex to the list
+     * @param vertexNode the adjacent vertex
+     */
+    @Override
+    public void addAdjacentVertex(VertexGUI<V, E> vertexNode){
+        this.adjacentVertexes.add(vertexNode);
+    }
+
+    /**
+     * THis method removes the vertex adjacent to the current vertex
+     * @param vertexNode the vertex to be removed
+     * @return returns the removed vertex
+     */
+    @Override
+    public VertexGUI<V, E> removeAdjacentVertex(VertexGUI<V, E> vertexNode){
+        VertexGUI<V, E> vertex = null;
+        if(this.adjacentVertexes.contains(vertexNode)){
+            vertex = vertexNode;
+            this.adjacentVertexes.remove(vertexNode);
+        }
+        return vertex;
+    }
+
+    /**
+     * This method returns a collection of adjacent vertexes from the current list
+     * @param vertexes the collection of vertexes
+     * @return returns the removed collection
+     */
+    @Override
+    public List<VertexGUI<V,E>> removeAdjacentVertexes(Collection<VertexGUI<V, E>> vertexes){
+        Collection<VertexGUI<V, E>> vertexGUIS = null;
+        if(new HashSet<>(this.adjacentVertexes).containsAll(vertexes)){
+            vertexGUIS = vertexes;
+        }
+        return (List<VertexGUI<V, E>>) vertexGUIS;
+    }
+
+    /**
+     * This method checks if the given vertex is adjacent to the current one
+     * @param vertexGUI the vertex to be validated
+     * @return returns true if it is adjacent else false
+     */
+    @Override
+    public boolean isAdjacent(VertexGUI<V, E> vertexGUI){
+        return this.adjacentVertexes.contains(vertexGUI);
+    }
+
+    /**
+     * @return returns the number of adjacent vertexes to this one
+     */
+    @Override
+    public int adjacentVertexes(){
+        return this.adjacentVertexes.size();
+    }
+
+    /**
+     * This method binds the properties of the vertex node with properties of the shape of the vertex
+     * @param vertexShape the shape for the vertex
+     */
+    private void ShapePropertiesBinder(NodeCircle vertexShape){
+        if(this.vertexShape != null){
+            if(this.xCenterPosition.isBound()){
+                this.xCenterPosition.unbindBidirectional(this.vertexShape.xCenterPositionProperty());
+            }
+            if(this.yCenterPosition.isBound()){
+                 this.yCenterPosition.unbindBidirectional(this.vertexShape.yCenterPositionProperty());
+            }
+
+            if(this.circleRadius.isBound()){
+                this.circleRadius.unbindBidirectional(this.vertexShape.shapeRadiusProperty());
+            }
+        }else {
+            this.xCenterPosition.bindBidirectional(vertexShape.xCenterPositionProperty());
+            this.yCenterPosition.bindBidirectional(vertexShape.yCenterPositionProperty());
+            this.circleRadius.bindBidirectional(vertexShape.shapeRadiusProperty());
+        }
     }
 }
